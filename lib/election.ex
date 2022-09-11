@@ -13,5 +13,20 @@ defmodule Election do
       "Election for #{election.name}\n",
     ]
   end
+
+  def view_body(election) do
+    election.candidates
+    |> Enum.sort(&(&1.votes >= &2.votes))
+    |> Enum.map(fn %{id: id, name: name, votes: votes} ->
+      "#{id}\t#{votes}\t#{name}\n"
+    end)
+    |> (fn candidates ->
+        [
+          "ID\tVotes\tName\n",
+          "-------------------------------\n"
+          | candidates
+        ]
+    end).()
+  end
 end
 
