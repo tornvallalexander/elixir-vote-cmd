@@ -16,17 +16,27 @@ defmodule Election do
 
   def view_body(election) do
     election.candidates
+    |> sort_candidates_votes_by_desc()
+    |> format_candidates()
+    |> add_body_headers()
+  end
+
+  defp sort_candidates_votes_by_desc(candidates) do
+    candidates
     |> Enum.sort(&(&1.votes >= &2.votes))
-    |> Enum.map(fn %{id: id, name: name, votes: votes} ->
-      "#{id}\t#{votes}\t#{name}\n"
-    end)
-    |> (fn candidates ->
-        [
-          "ID\tVotes\tName\n",
-          "-------------------------------\n"
-          | candidates
-        ]
-    end).()
+  end
+
+  defp format_candidates(candidates) do
+    candidates
+    |> Enum.map(fn %{id: id, name: name, votes: votes} -> "#{id}\t#{votes}\t#{name}\n" end)
+  end
+
+  defp add_body_headers(candidates) do
+    [
+      "ID\tVotes\tName\n",
+      "-------------------------------\n"
+      | candidates
+    ]
   end
 end
 
