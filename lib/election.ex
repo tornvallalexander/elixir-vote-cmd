@@ -8,9 +8,18 @@ defmodule Election do
     next_id: 3
   )
 
+  def view(election) do 
+    [
+      view_header(election),
+      view_body(election),
+      view_footer(),
+    ]
+  end
+
   def view_header(election) do
     [
-      "Election for #{election.name}\n",
+      "Election for #{election.name}",
+      add_whitespace(),
     ]
   end
 
@@ -19,6 +28,18 @@ defmodule Election do
     |> sort_candidates_votes_by_desc()
     |> format_candidates()
     |> add_body_headers()
+  end
+
+  def view_footer() do
+    [
+      add_whitespace(),
+      "commands: (n)ame <election>, (a)dd <candidate>, (v)ote <id>, (q)uit",
+      add_whitespace(),
+    ]
+  end
+
+  defp add_whitespace() do
+    "\n"
   end
 
   defp sort_candidates_votes_by_desc(candidates) do
