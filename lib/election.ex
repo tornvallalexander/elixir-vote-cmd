@@ -8,9 +8,26 @@ defmodule Election do
     next_id: 3
   )
 
+  def update(election, cmd) when is_binary(cmd) do
+    update(election, String.split(cmd))
+  end
+
   def update(election, ["n" <> _rest | args]) do
     name = Enum.join(args, " ")
     Map.put(election, :name, name)
+  end
+
+  def update(election, ["a" <> _rest | args]) do
+    name = Enum.join(args, " ")
+    candidate = Candidate.new(election.next_id, name)
+    candidates = [candidate | election.candidates]
+    election
+    |> Map.put(:candidates, candidates)
+    |> Map.put(:next_id, election.next_id + 1)
+  end
+
+  def update(election, ["v" <> _rest, id]) do
+    vote(election, Integer.parse(id))
   end
 
   def view(election) do 
@@ -42,6 +59,23 @@ defmodule Election do
       add_whitespace(),
     ]
   end
+
+  defp vote(election, {id, ""}) do
+    candidates = Enum.map(election.candidates, &maybe_inc_vote(&1, id))
+    Map.put(election, :candidates, candidates)
+  end
+
+  defp maybe_inc_vote(candidate, id) when is_integer(id) do
+    maybe_inc_vote(candidate, candidate.id == id)
+  end
+
+  defp maybe_inc_vote(candidate, _inc_vote = false), do: candidate
+
+  defp maybe_inc_vote(candidate, _inc_vote = true) do
+    Map.update!(candidate, :votes, &(&1 + 1))
+  end
+
+  defp vote(election, _errors), do: election
 
   defp add_whitespace() do
     "\n"
